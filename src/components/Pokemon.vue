@@ -51,7 +51,7 @@
           <h4 class="poke-name">Types</h4>
         </b-row>
         <b-row>
-          <b-col md="2" v-for="(typeData, i) in types" :key="typeData.type.name" style="margin-bottom: 10px;">
+          <b-col sm="4" md="2" v-for="(typeData, i) in types" :key="typeData.type.name" style="margin-bottom: 10px;">
             <b-card-group deck>
               <b-card>
                 <b-card-text class="poke-name">
