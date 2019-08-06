@@ -35,7 +35,7 @@
           <h4 class="poke-name">Moves</h4>
         </b-row>
         <b-row>
-          <b-col md="2" v-for="(moveData, i) in moves" :key="moveData.move.name" style="margin-bottom: 10px;">
+          <b-col sm="4" md="2" v-for="(moveData, i) in moves" :key="moveData.move.name" style="margin-bottom: 10px;">
             <b-card-group deck>
               <b-card>
                 <b-card-text class="poke-name">

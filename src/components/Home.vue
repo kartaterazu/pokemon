@@ -9,7 +9,7 @@
     <div class="list">
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="2" v-for="(pokemon, i) in pokemons" :key="pokemon.url" style="margin-bottom: 10px;">
+          <b-col sm="6" md="3" v-for="(pokemon, i) in pokemons" :key="pokemon.url" style="margin-bottom: 10px;">
             <router-link :to="{ name: 'Pokemon', params: { name: pokemon.name } }">            
               <b-card-group deck>
                 <b-card>
