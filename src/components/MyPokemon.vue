@@ -4,22 +4,28 @@
     <header>
       <h1> 
         My Pokemon List ({{ totalOwned }} owned)
-        <b-button pill variant="primary" @click="getPokemonList();">Refresh</b-button>
+        <b-button pill variant="primary" @click="getPokemonList()">Refresh</b-button>
       </h1>
     </header>
     <div class="list">
       <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="2" v-for="pokemon in pokemons" :key="pokemon" style="margin-bottom: 10px;">
-            <router-link :to="{ name: 'Pokemon', params: { name: pokemon } }">            
-              <b-card-group deck>
-                <b-card>
+        <b-row v-if="totalOwned > 0">
+          <b-col md="2" v-for="pokemon in pokemons" :key="pokemon.name" style="margin-bottom: 10px;">
+            <b-card-group deck>
+              <b-card :img-src="pokemon.images" :img-alt="pokemon.name" img-top class="mb-2">
+                <router-link :to="{ name: 'Pokemon', params: { name: pokemon.name } }">            
                   <b-card-text class="poke-name">
-                    {{ pokemon }}
+                    {{ pokemon.name }} ({{ pokemon.nickname }})
                   </b-card-text>
-                </b-card>
-              </b-card-group>
-            </router-link>
+                </router-link>
+                <b-button pill variant="danger" @click="removePokemon(pokemon.name)">Remove</b-button>
+              </b-card>
+            </b-card-group>
+          </b-col>
+        </b-row>
+        <b-row v-else style="text-align: center;">
+          <b-col md="12">
+            You don't have any pokemon, catch your favourite pokemon on&nbsp;<router-link to="/">Pokemon List</router-link>
           </b-col>
         </b-row>
       </b-container>
@@ -58,6 +64,49 @@ export default {
       if(this.arrPokemon != null) {
         this.totalOwned = this.arrPokemon.length
       }
+    },
+    removePokemon(pokemon) {
+      this.$bvModal.msgBoxConfirm(`Please confirm that you want to delete ${pokemon}.`, {
+          title: 'Please Confirm',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'danger',
+          okTitle: 'YES',
+          cancelTitle: 'NO',
+          footerClass: 'p-2',
+          hideHeaderClose: false,
+          headerBgVariant: 'danger',
+          headerTextVariant: 'light',
+          centered: true
+      })
+      .then(value => {
+        if(value) {
+          var filtered = this.pokemons.filter(function(value, index, arr){
+
+              return value.name != pokemon;
+
+          })
+
+          localStorage.setItem("pokemonName", JSON.stringify(filtered))
+          this.totalOwned = filtered.length
+          this.arrPokemon = JSON.parse(localStorage.getItem("pokemonName")) || []
+          this.pokemons   = this.arrPokemon
+
+          this.makeToast('success', 'Congratulations', `${pokemon} has been remove from your pokemon list`)
+        }
+      })
+      .catch(err => {
+        this.makeToast('danger', 'Ooops..!!', `Failed to remove ${pokemon} from your pokemon list`)
+        console.log(err)
+        return false
+      })
+    },
+    makeToast(variant, title, msg) {
+      this.$bvToast.toast(msg, {
+        title: title,
+        variant: variant,
+        solid: true
+      })
     }
   }
 }

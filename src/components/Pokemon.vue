@@ -14,7 +14,7 @@
               {{ pokemonDesc }}
               <br>
               <small class="text-muted">
-                <b-button pill variant="primary" @click="catchPokemon(pokemon.name)" v-if="catched == false">
+                <b-button pill variant="primary" v-b-modal.modal-catch v-if="catched == false">
                   Catch Me !!
                 </b-button>
                 <b-alert show variant="success" v-if="catched == true">
@@ -61,6 +61,31 @@
             </b-card-group>
           </b-col>
         </b-row>
+        <b-modal
+          id="modal-catch"
+          ref="modal"
+          title="Submit Your Pokemon Nick Name"
+          ok-title="Catch !"
+          @show="resetModal"
+          @hidden="resetModal"
+          @ok="handleOk"
+        >
+          <form ref="form" @submit.stop.prevent="catchPokemon(pokemon.name, img)">
+            <b-form-group
+              :state="nameState"
+              label="Pokemon Nick Name"
+              label-for="name-input"
+              invalid-feedback="Nick Name is required"
+            >
+              <b-form-input
+                id="name-input"
+                v-model="nick_name"
+                :state="nameState"
+                required
+              ></b-form-input>
+            </b-form-group>
+          </form>
+        </b-modal>
       </b-container>
     </div>
   </div>
@@ -88,7 +113,9 @@ export default {
           moves: [],
           types: [],
           arrPokemon: JSON.parse(localStorage.getItem("pokemonName")),
-          catched: false
+          catched: false,
+          nick_name: '',
+          nameState: null
       }
   },
   mounted() {
@@ -119,36 +146,71 @@ export default {
           console.log(err)     
         })
       },
-      catchPokemon(pokemonName) {
+      catchPokemon(pokemonName, img) {
         let catched = Math.floor(Math.random() * 2)
 
         if(catched == 1) {
-          setTimeout(this.catchedSuccess(pokemonName),2000)
+          setTimeout(this.catchedSuccess(pokemonName, img),2000)
         } else {
           this.makeToast('info', 'HAHAHAHA...!!', "you're weak, you must try harder to catch me!! HAHAHAHA..!!")
         }
       },
       isCatched() {
         if(this.arrPokemon != null) {
-          if(this.arrPokemon.includes(this.$route.params.name))
+          let pokemonName = this.$route.params.name
+          var newPokemon = []
+
+          var filtered = this.arrPokemon.filter(function(value, index, arr){
+            newPokemon.push(value.name)
+            return newPokemon
+          })
+
+          if(newPokemon.includes(this.$route.params.name))
           {
             this.catched = true
           }
         }
       },
-      catchedSuccess(pokemonName) {
+      catchedSuccess(pokemonName, img) {
+        // Exit when the form isn't valid
+        if (!this.checkFormValidity()) {
+          return
+        }
+
         var arrPokemon = []
         
         if(this.arrPokemon == null) {
           arrPokemon.push(pokemonName)
         } else {
           arrPokemon = this.arrPokemon
-          arrPokemon.push(pokemonName)
+          var newPokemon = {name: pokemonName, nickname: this.nick_name, images: img}
+          arrPokemon.push(newPokemon)
         }
 
         localStorage.setItem("pokemonName", JSON.stringify(arrPokemon))
         this.catched = true
         this.makeToast('success', 'Congratulations', "Aww.. you catch me.. i'll be your good pokemon sir")
+
+        // Hide the modal manually
+        this.$nextTick(() => {
+          this.$refs.modal.hide()
+        })
+      },
+      checkFormValidity() {
+        const valid = this.$refs.form.checkValidity()
+        this.nameState = valid ? 'valid' : 'invalid'
+        return valid
+      },
+      resetModal() {
+        this.name = ''
+        this.nameState = null
+      },
+      handleOk(bvModalEvt) {
+        // Prevent modal from closing
+        bvModalEvt.preventDefault()
+
+        // Trigger submit handler
+        this.catchedSuccess(this.pokemon.name, this.img)
       },
       makeToast(variant, title, msg) {
         this.$bvToast.toast(msg, {
