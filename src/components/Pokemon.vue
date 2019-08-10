@@ -180,7 +180,7 @@ export default {
         var arrPokemon = []
         
         if(this.arrPokemon == null) {
-          arrPokemon.push(pokemonName)
+          arrPokemon.push({name: pokemonName, nickname: this.nick_name, images: img})
         } else {
           arrPokemon = this.arrPokemon
           var newPokemon = {name: pokemonName, nickname: this.nick_name, images: img}
