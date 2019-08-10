@@ -8,6 +8,7 @@ module.exports = {
     publicPath: '/dist/',
     filename: 'build.js'
   },
+  publicPath: process.env.NODE_ENV === 'production' ? '/my-project/' : '/',
   module: {
     rules: [
       {
