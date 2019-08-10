@@ -28,7 +28,7 @@
             <b-alert show variant="info">
               You don't have any pokemon, catch your favourite pokemon on&nbsp;<router-link to="/">Pokemon List</router-link>
             </b-alert>
-          </b-col>
+          </b-col> 
         </b-row>
       </b-container>
     </div>
